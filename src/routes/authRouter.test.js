@@ -1,11 +1,24 @@
 const request = require('supertest');
 const app = require('../service');
+const orderRouter = require('../routes/orderRouter.js')
 
-
-
-
+const { Role, DB } = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
+
+async function createAdminUser() {
+    let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
+    user.name = randomName();
+    user.email = user.name + '@admin.com';
+  
+    await DB.addUser(user);
+  
+    return user;
+}
+  
+function randomName() {
+      return Math.random().toString(36).substring(2, 12);
+}
 
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
@@ -24,3 +37,63 @@ test('login', async () => {
   console.log(password)
   
 });
+
+test('test docs endpoint', async () => {
+    const homePage = await request(app).get('/api/').send(testUser);
+    expect(homePage.status).toBe(404);
+    expect(homePage.body.message).toMatch('unknown endpoint')
+});
+
+test('test docs endpoint', async () => {
+    const homePage = await request(app).get('/').send(testUser);
+    expect(homePage.status).toBe(200);
+    expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test docs endpoint', async () => {
+    const homePage = await request(app).get('/api/docs').send(testUser);
+    expect(homePage.status).toBe(200);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test orderRouter get', async () => {
+    const homePage = await request(app).get('/api/order/menu').send(testUser);
+    expect(homePage.status).toBe(200);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test orderRouter put', async () => {
+    const homePage = await request(app).put('/api/order/menu').send(testUser);
+    expect(homePage.status).toBe(401);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test orderRouter order pizza', async () => {
+   // const loginRes = await request(app).put('/api/auth').send(testUser);
+
+    const orderRequest = {
+        franchiseId: 1,
+        storeId: 1,
+        items: [
+          { menuId: 1, description: 'Veggie', price: 0.05 },
+        ],
+    };
+    const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
+    expect(homePage.status).toBe(200);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test orderRouter order pizza', async () => {
+    // const loginRes = await request(app).put('/api/auth').send(testUser);
+ 
+     const newMenuItem = { 
+        "title":"Josh", 
+        "description": "Nothing but cheese.. and I mean nothing",
+        "image":"pizza9.png", 
+        "price": 0.00014
+    };
+    const homePage = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testUserAuthToken}`).send(newMenuItem);
+    expect(homePage.status).toBe(403);
+     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+ });
+
