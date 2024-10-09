@@ -1,12 +1,12 @@
 const request = require('supertest');
 const app = require('../service');
 
-const { Role, DB } = require('../database/database.js');
+//const { Role, DB } = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
 let adminUser = { email: 'a@jwt.com', password: 'admin'}
-
+/*
 async function createAdminUser() {
     let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
     user.name = randomName();
@@ -16,7 +16,7 @@ async function createAdminUser() {
   
     return user;
 }
-  
+  */
 function randomName() {
       return Math.random().toString(36).substring(2, 12);
 }
@@ -42,6 +42,14 @@ test('login', async () => {
   
 });
 
+test('Register user fail', async () => {
+    const failUser = { email: 'reg@test.com', password: 'a' };
+    const loginRes = await request(app).post('/api/auth').send(failUser);
+
+    expect(loginRes.status).toBe(400);
+    
+});
+
 test('test docs endpoint', async () => {
     const homePage = await request(app).get('/api/').send(testUser);
     expect(homePage.status).toBe(404);
@@ -60,10 +68,17 @@ test('test docs endpoint', async () => {
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test update user', async () => {
+test('test update user fail', async () => {
     testUser.name = "Joshua"
     const homePage = await request(app).put(`/api/auth/${userIdNum}`).send(testUser);
     expect(homePage.status).toBe(401);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test update user succeed', async () => {
+    testUser.name = "Joshua"
+    const homePage = await request(app).put(`/api/auth/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(200);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
@@ -160,6 +175,10 @@ test('test add a new pizza to menu', async () => {
 });
 
 
+test('logout', async () => {
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200);
+});
 
 test('test get user franchises', async () => {
     const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
