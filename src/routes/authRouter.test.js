@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../service');
 
-//const { Role, DB } = require('../database/database.js');
+const { Role/*, DB */} = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
@@ -174,17 +174,38 @@ test('test add a new pizza to menu', async () => {
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
+test('create franchise user', async () => {
+    let franchiseUser = { password: 'franch', roles: [{ role: Role.Franchisee }] };
+    franchiseUser.name = randomName();
+    franchiseUser.email = franchiseUser.name + '@franchise.com';
 
-test('logout', async () => {
-    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
-    expect(logoutRes.status).toBe(200);
-});
+    const registerFranchiseRes = await request(app).post('/api/auth').send(franchiseUser);
+    expect(registerFranchiseRes.status).toBe(200)
+
+
+})
 
 test('test get user franchises', async () => {
+ //   testUser.password = 'a'
+ //   const loginRes = await request(app).put('/api/auth').send(testUser);
+ //   expect(loginRes.status).toBe(200)
     const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
     expect(homePage.status).toBe(200);
    // expect(homePage.body.message).toMatch('unknown endpoint')
 });
+
+
+test('logout', async () => {
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200);
+    
+    testUser.password = "WRONG"
+    const loginFail = await request(app).put('/api/auth').send(testUser);
+    expect(loginFail.status).toBe(404)
+
+});
+
+
 
 
 /*
