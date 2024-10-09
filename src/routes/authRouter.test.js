@@ -5,6 +5,7 @@ const { Role, DB } = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
+let adminUser = { email: 'a@jwt.com', password: 'admin'}
 
 async function createAdminUser() {
     let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
@@ -23,6 +24,7 @@ function randomName() {
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(testUser);
+  //console.log(registerRes)
   userIdNum = registerRes.body.user.id;
   testUserAuthToken = registerRes.body.token;
 
@@ -137,16 +139,13 @@ test('test add a new pizza to menu', async () => {
     //const logOut = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`);
     //expect(logOut.status).toBe(200)
     // const loginRes = await request(app).put('/api/auth').send(testUser);
-    const authUser = await createAdminUser()
-    console.log(authUser);
+   // const authUser = await createAdminUser()
 
-    const registerResAdmin = await request(app).post('/api/auth').send(authUser);
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
     expect(registerResAdmin.status).toBe(200);
+    console.log(registerResAdmin.body)
+    
     const testAdminAuthToken = registerResAdmin.body.token;
-    console.log(testAdminAuthToken);
-
-
-
 
      const newMenuItem = { 
         "id": 14,
@@ -156,7 +155,32 @@ test('test add a new pizza to menu', async () => {
         "price": 0.00014
     };
     const homePage = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testAdminAuthToken}`).send(newMenuItem);
-    expect(homePage.status).toBe(403);
+    expect(homePage.status).toBe(200);
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
+
+
+test('test get user franchises', async () => {
+    const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(200);
+   // expect(homePage.body.message).toMatch('unknown endpoint')
+});
+
+
+/*
+test('test delete franchises', async () => {
+
+   // const authUser = await createAdminUser();
+    const u = {email: "jy5z2gjfxe@admin.com", password: "$2b$10$GhnsIDBn2l/FH.RruHLUY.QaqrmUChETgudjG80GBXHOSSMXeDLIK"}
+
+    const registerResAdmin = await request(app).put('/api/auth').send(u);
+    expect(registerResAdmin.status).toBe(200);
+    
+    const testAdminAuthToken = registerResAdmin.body.token;
+   // console.log(registerResAdmin)
+
+    const homePage = await request(app).delete(`/api/franchise/1`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(403);
+   // expect(homePage.body.message).toMatch('unknown endpoint')
+});*/
