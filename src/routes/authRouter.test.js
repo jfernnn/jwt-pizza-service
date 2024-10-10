@@ -33,7 +33,7 @@ beforeAll(async () => {
   //console.log(testUserAuthToken)
 });
 
-test('login', async () => {
+test('login success', async () => {
   const loginRes = await request(app).put('/api/auth').send(testUser);
   expect(loginRes.status).toBe(200);
   expect(loginRes.body.token).toMatch(/^[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*\.[a-zA-Z0-9\-_]*$/);
@@ -51,13 +51,14 @@ test('Register user fail', async () => {
     
 });
 
-test('test docs endpoint', async () => {
+
+test('test main page fail', async () => {
     const homePage = await request(app).get('/api/').send(testUser);
     expect(homePage.status).toBe(404);
     expect(homePage.body.message).toMatch('unknown endpoint')
 });
 
-test('test docs endpoint', async () => {
+test('test main page success', async () => {
     const homePage = await request(app).get('/').send(testUser);
     expect(homePage.status).toBe(200);
     expect(homePage.body.message).toMatch('welcome to JWT Pizza')
@@ -71,31 +72,31 @@ test('test docs endpoint', async () => {
 
 test('test update user fail', async () => {
     testUser.name = "Joshua"
-    const homePage = await request(app).put(`/api/auth/${userIdNum}`).send(testUser);
-    expect(homePage.status).toBe(401);
+    const homePage = await request(app).put(`/api/auth/32`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(403);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test update user succeed', async () => {
+test('test update user success', async () => {
     testUser.name = "Joshua"
     const homePage = await request(app).put(`/api/auth/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
     expect(homePage.status).toBe(200);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test orderRouter get', async () => {
+test('test get pizza success', async () => {
     const homePage = await request(app).get('/api/order/menu').send(testUser);
     expect(homePage.status).toBe(200);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test orderRouter put', async () => {
+test('test add item to menu fail', async () => {
     const homePage = await request(app).put('/api/order/menu').send(testUser);
     expect(homePage.status).toBe(401);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test orderRouter order pizza', async () => {
+test('test place and get order success', async () => {
    // const loginRes = await request(app).put('/api/auth').send(testUser);
 
     const orderRequest = {
@@ -112,7 +113,7 @@ test('test orderRouter order pizza', async () => {
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test orderRouter order pizza', async () => {
+test('test order pizza w invalid order', async () => {
     // const loginRes = await request(app).put('/api/auth').send(testUser);
  
      const orderRequest = {
@@ -124,6 +125,7 @@ test('test orderRouter order pizza', async () => {
      };
      const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
      expect(homePage.status).toBe(500);
+    // expect(homePage.status.message).toMatch('Failed to fulfill order at factory')
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
  });
 
@@ -150,8 +152,19 @@ test('test list the franchises', async () => {
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
+test('test list the franchises as admin', async () => {
+    //    const authUser = createAdminUser()
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
 
-test('test add a new pizza to menu', async () => {
+    const homePage = await request(app).get('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(200);
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+});
+
+test('test add a new pizza to menu success', async () => {
     //const logOut = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`);
     //expect(logOut.status).toBe(200)
     // const loginRes = await request(app).put('/api/auth').send(testUser);
@@ -178,7 +191,7 @@ test('test add a new pizza to menu', async () => {
 
 test('create franchise user', async () => {
     let franchiseUser = { password: 'franch', roles: [{ role: Role.Franchisee }] };
-    franchiseUser.name = randomName();
+    franchiseUser.name = "franchisee" + randomName();
     franchiseUser.email = franchiseUser.name + '@franchise.com';
 
     const registerFranchiseRes = await request(app).post('/api/auth').send(franchiseUser);
@@ -191,10 +204,28 @@ test('test get user franchises', async () => {
  //   testUser.password = 'a'
  //   const loginRes = await request(app).put('/api/auth').send(testUser);
  //   expect(loginRes.status).toBe(200)
-    const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+
+    const homePage = await request(app).get(`/api/franchise/1`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
     expect(homePage.status).toBe(200);
+
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
    // expect(homePage.body.message).toMatch('unknown endpoint')
 });
+
+test('test get user franchises', async () => {
+    //   testUser.password = 'a'
+    //   const loginRes = await request(app).put('/api/auth').send(testUser);
+    //   expect(loginRes.status).toBe(200)
+   
+       const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
+       expect(homePage.status).toBe(200);
+   
+      // expect(homePage.body.message).toMatch('unknown endpoint')
+   });
 
 test('test create franchise fail', async () => {
     const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
@@ -221,6 +252,17 @@ test('test delete franchise fail', async () => {
 
     const franchiseRes = await request(app).delete(`/api/franchise/${franchiseID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
     expect(franchiseRes.status).toBe(403)
+});
+
+test('test delete franchise fail', async () => {
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    
+    const testAdminAuthToken = registerResAdmin.body.token;
+    const franchiseRes = await request(app).delete(`/api/franchise/999`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
+    expect(franchiseRes.status).toBe(403)
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
 });
 
 test('test delete franchise success', async () => {
@@ -285,22 +327,3 @@ test('logout', async () => {
     expect(loginFail.status).toBe(404)
 
 });
-
-
-
-/*
-test('test delete franchises', async () => {
-
-   // const authUser = await createAdminUser();
-    const u = {email: "jy5z2gjfxe@admin.com", password: "$2b$10$GhnsIDBn2l/FH.RruHLUY.QaqrmUChETgudjG80GBXHOSSMXeDLIK"}
-
-    const registerResAdmin = await request(app).put('/api/auth').send(u);
-    expect(registerResAdmin.status).toBe(200);
-    
-    const testAdminAuthToken = registerResAdmin.body.token;
-   // console.log(registerResAdmin)
-
-    const homePage = await request(app).delete(`/api/franchise/1`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
-    expect(homePage.status).toBe(403);
-   // expect(homePage.body.message).toMatch('unknown endpoint')
-});*/
