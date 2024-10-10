@@ -6,6 +6,7 @@ const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
 let adminUser = { email: 'a@jwt.com', password: 'admin'}
+let franchiseID;
 /*
 async function createAdminUser() {
     let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
@@ -114,10 +115,10 @@ test('test orderRouter order pizza', async () => {
     // const loginRes = await request(app).put('/api/auth').send(testUser);
  
      const orderRequest = {
-         franchiseId: 19,
-         storeId: 81,
+         franchiseId: 199,
+         storeId: 891,
          items: [
-           { menuId: 41, description: 'Vaggie', price: 10.05 },
+           { menuId: 491, description: 'Vaggie', price: 10.05 },
          ],
      };
      const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
@@ -209,8 +210,27 @@ test('test create franchise success', async () => {
     testFranchise.name = randomName()
     const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testFranchise);
     expect(franchiseRes.status).toBe(200)
+    franchiseID = franchiseRes.body.id
+
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
 });
 
+test('test delete franchise fail', async () => {
+
+    const franchiseRes = await request(app).delete(`/api/franchise/${franchiseID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
+    expect(franchiseRes.status).toBe(403)
+});
+
+test('test delete franchise success', async () => {
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    
+    const testAdminAuthToken = registerResAdmin.body.token;
+
+    const franchiseRes = await request(app).delete(`/api/franchise/${franchiseID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
+    expect(franchiseRes.status).toBe(200)
+});
 
 
 test('logout', async () => {
