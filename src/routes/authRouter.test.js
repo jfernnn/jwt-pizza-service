@@ -39,7 +39,6 @@ test('login', async () => {
   const { password, ...user } = { ...testUser, roles: [{ role: 'diner' }] };
   expect(loginRes.body.user).toMatchObject(user);
   console.log(password)
-  
 });
 
 test('Register user fail', async () => {
@@ -158,7 +157,6 @@ test('test add a new pizza to menu', async () => {
 
     const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
     expect(registerResAdmin.status).toBe(200);
-    console.log(registerResAdmin.body)
     
     const testAdminAuthToken = registerResAdmin.body.token;
 
@@ -171,6 +169,8 @@ test('test add a new pizza to menu', async () => {
     };
     const homePage = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testAdminAuthToken}`).send(newMenuItem);
     expect(homePage.status).toBe(200);
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
@@ -194,6 +194,24 @@ test('test get user franchises', async () => {
    // expect(homePage.body.message).toMatch('unknown endpoint')
 });
 
+test('test create franchise fail', async () => {
+    const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
+    const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testUserAuthToken}`).send(testFranchise);
+    expect(franchiseRes.status).toBe(403)
+});
+
+test('test create franchise success', async () => {
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    
+    const testAdminAuthToken = registerResAdmin.body.token;
+    const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
+    testFranchise.name = randomName()
+    const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testFranchise);
+    expect(franchiseRes.status).toBe(200)
+});
+
+
 
 test('logout', async () => {
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
@@ -204,7 +222,6 @@ test('logout', async () => {
     expect(loginFail.status).toBe(404)
 
 });
-
 
 
 
