@@ -113,7 +113,7 @@ test('test create franchise success', async () => {
 test('test create store fail', async () => {
     const testStore= {name:"SLC"}
     testStore.name = randomName()
-    const storeRes = await request(app).post(`/api/franchise/1/store`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testStore);
+    const storeRes = await request(app).post(`/api/franchise/99/store`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testStore);
     expect(storeRes.status).toBe(403)
 });
 
