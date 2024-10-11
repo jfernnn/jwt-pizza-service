@@ -220,7 +220,6 @@ test('test add a new pizza to menu success', async () => {
 
     const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
     expect(registerResAdmin.status).toBe(200);
-    
     const testAdminAuthToken = registerResAdmin.body.token;
 
      const newMenuItem1 = { 
@@ -285,18 +284,24 @@ test('test get user franchises', async () => {
 
 
 test('test place and get order success', async () => {
-     const orderRequest = {
-         franchiseId: franchiseID,
-         storeId: storeID,
-         items: [
-           { menuId: 14, description: 'Josh', price: 0.00014 },
-         ],
-     };
-     const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
-     expect(homePage.status).toBe(200);
-     const getOrders = await request(app).get('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
-     expect(getOrders.status).toBe(200);
-     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+    const orderRequest = {
+        "franchiseId": franchiseID,
+        "storeId": storeID,
+        "items": [
+           { "menuId": 14, "description": 'Josh', "price": 0.00014 },
+        ],
+    };
+    const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testAdminAuthToken}`).send(orderRequest);
+    expect(homePage.status).toBe(200);
+    const getOrders = await request(app).get('/api/order').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(getOrders.status).toBe(200);
+    
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
  });
 
  test('test delete store fail', async () => {
