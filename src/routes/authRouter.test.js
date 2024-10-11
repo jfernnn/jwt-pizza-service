@@ -6,6 +6,7 @@ const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
 let adminUser = { email: 'a@jwt.com', password: 'admin'}
+//let franchiseeUser = { email: 'f@jwt.com', password: 'franch'}
 let franchiseID;
 let storeID;
 
@@ -18,7 +19,16 @@ async function createAdminUser() {
   
     return user;
 }
+/*
+async function createFranchiseeUser() {
+    let user = { password: 'franchiseSecrets', roles: [{ role: Role.Franchisee }] };
+    user.name = randomName();
+    user.email = user.name + '@franch.com';
   
+    await DB.addUser(user);
+  
+    return user;
+}*/
 function randomName() {
       return Math.random().toString(36).substring(2, 12);
 }
@@ -26,30 +36,17 @@ function randomName() {
 beforeAll(async () => {
   testUser.email = Math.random().toString(36).substring(2, 12) + '@test.com';
   const registerRes = await request(app).post('/api/auth').send(testUser);
-  //console.log(registerRes)
   userIdNum = registerRes.body.user.id;
   testUserAuthToken = registerRes.body.token;
+
   const ad = await createAdminUser()
   adminUser.password = ad.password
   adminUser.email = ad.email
 /*
-  const addItem1 = { id:1, title:"Veggie", description: "A garden of delight", image:"pizza1.png", price: 0.0038 }
-  const addItem2 = { id:2, title:"Pepperoni", description: "Spicy treat", image:"pizza2.png", price: 0.0042 }
-  await DB.addMenuItem(addItem1)
-  await DB.addMenuItem(addItem2)
-
-  const addFranchisee = {name:"pizza franchisee", email:"f@jwt.com", password:"franchisee", roles: [{ role: Role.Franchisee }]}
-  await DB.addUser(addFranchisee)
-
-  const addFranchise = { name: "pizzaPocket", "admins": [{email: "f@jwt.com"}]}
-  await DB.createFranchise(addFranchise)
-
-  const addStore = {franchiseId: 1, name:"SLC"}
-  await DB.createStore(addStore)
-
-
-*/
-  //console.log(testUserAuthToken)
+  const fu = await createFranchiseeUser()
+  franchiseeUser.password = fu.password
+  franchiseeUser.email = fu.email
+  */
 });
 
 test('login success', async () => {
@@ -67,9 +64,7 @@ test('Register user fail', async () => {
     const loginRes = await request(app).post('/api/auth').send(failUser);
 
     expect(loginRes.status).toBe(400);
-    
 });
-
 
 test('test create franchise fail', async () => {
     const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
@@ -97,7 +92,6 @@ test('test create store fail', async () => {
     testStore.name = randomName()
     const storeRes = await request(app).post(`/api/franchise/1/store`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testStore);
     expect(storeRes.status).toBe(403)
-
 });
 
 test('test create store success', async () => {
@@ -142,12 +136,6 @@ test('test update user fail', async () => {
 test('test update user success', async () => {
     testUser.name = "Joshua"
     const homePage = await request(app).put(`/api/auth/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
-    expect(homePage.status).toBe(200);
-    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
-});
-
-test('test get pizza success', async () => {
-    const homePage = await request(app).get('/api/order/menu').send(testUser);
     expect(homePage.status).toBe(200);
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
@@ -203,8 +191,22 @@ test('test list the franchises as admin', async () => {
     const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
     expect(registerResAdmin.status).toBe(200);
     const testAdminAuthToken = registerResAdmin.body.token;
+    
+    const homePage = await request(app).get('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(adminUser);
+    expect(homePage.status).toBe(200);
 
-    const homePage = await request(app).get('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+         //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+    });
+
+test('test list the franchises as admin', async () => {
+    //    const authUser = createAdminUser()
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+
+    const homePage = await request(app).get(`/api/franchise/${registerResAdmin.id}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(homePage.status).toBe(200);
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(logoutRes.status).toBe(200)
@@ -221,18 +223,33 @@ test('test add a new pizza to menu success', async () => {
     
     const testAdminAuthToken = registerResAdmin.body.token;
 
-     const newMenuItem = { 
+     const newMenuItem1 = { 
         "id": 14,
         "title":"Josh", 
         "description": "Nothing but cheese.. and I mean nothing",
         "image":"pizza9.png", 
         "price": 0.00014
     };
-    const homePage = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testAdminAuthToken}`).send(newMenuItem);
-    expect(homePage.status).toBe(200);
+    const newMenuItem2 = { 
+        "id": 2,
+        "title":"Pep", 
+        "description": "Classic pepperoni",
+        "image":"pizza8.png", 
+        "price": 0.0056
+    };
+    const addToMenu1 = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testAdminAuthToken}`).send(newMenuItem1);
+    expect(addToMenu1.status).toBe(200);
+    const addToMenu2 = await request(app).put('/api/order/menu').set("Authorization", `Bearer ${testAdminAuthToken}`).send(newMenuItem2);
+    expect(addToMenu2.status).toBe(200);
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(logoutRes.status).toBe(200)
      //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
+
+test('test get pizza success', async () => {
+    const homePage = await request(app).get('/api/order/menu').send(testUser);
+    expect(homePage.status).toBe(200);
+    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
 test('create franchise user', async () => {
@@ -242,8 +259,6 @@ test('create franchise user', async () => {
 
     const registerFranchiseRes = await request(app).post('/api/auth').send(franchiseUser);
     expect(registerFranchiseRes.status).toBe(200)
-
-
 })
 
 test('test get user franchises', async () => {
@@ -263,20 +278,13 @@ test('test get user franchises', async () => {
 });
 
 test('test get user franchises', async () => {
-    //   testUser.password = 'a'
-    //   const loginRes = await request(app).put('/api/auth').send(testUser);
-    //   expect(loginRes.status).toBe(200)
-   
        const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
        expect(homePage.status).toBe(200);
-   
       // expect(homePage.body.message).toMatch('unknown endpoint')
    });
 
 
 test('test place and get order success', async () => {
-    // const loginRes = await request(app).put('/api/auth').send(testUser);
- 
      const orderRequest = {
          franchiseId: franchiseID,
          storeId: storeID,
