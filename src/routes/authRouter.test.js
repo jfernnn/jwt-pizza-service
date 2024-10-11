@@ -32,6 +32,23 @@ beforeAll(async () => {
   const ad = await createAdminUser()
   adminUser.password = ad.password
   adminUser.email = ad.email
+
+  const addItem1 = { title:"Veggie", description: "A garden of delight", image:"pizza1.png", price: 0.0038 }
+  const addItem2 = { title:"Pepperoni", description: "Spicy treat", image:"pizza2.png", price: 0.0042 }
+  await DB.addMenuItem(addItem1)
+  await DB.addMenuItem(addItem2)
+
+  const addFranchisee = {name:"pizza franchisee", email:"f@jwt.com", password:"franchisee", roles: [{ role: Role.Franchisee }]}
+  await DB.addUser(addFranchisee)
+
+  const addFranchise = { name: "pizzaPocket", "admins": [{email: "f@jwt.com"}]}
+  await DB.createFranchise(addFranchise)
+
+  const addStore = {franchiseId: 1, name:"SLC"}
+  await DB.createStore(addStore)
+
+
+
   //console.log(testUserAuthToken)
 });
 
@@ -312,9 +329,7 @@ test('test delete store success', async () => {
     expect(registerResAdmin.status).toBe(200);
     const testAdminAuthToken = registerResAdmin.body.token;
 
-    const testStore= {franchiseId: 1, name:"SLC"}
-    testStore.name = randomName()
-    const storeRes = await request(app).delete(`/api/franchise/1/store/${storeID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testStore);
+    const storeRes = await request(app).delete(`/api/franchise/1/store/${storeID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
     expect(storeRes.status).toBe(200)
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(logoutRes.status).toBe(200)
