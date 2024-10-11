@@ -1,14 +1,14 @@
 const request = require('supertest');
 const app = require('../service');
 
-const { Role/*, DB */} = require('../database/database.js');
+const { Role, DB } = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
-let adminUser = { name: '常用名字', email: 'a@jwt.com', password: 'admin'}
+let adminUser = { email: 'a@jwt.com', password: 'admin'}
 let franchiseID;
 let storeID;
-/*
+
 async function createAdminUser() {
     let user = { password: 'toomanysecrets', roles: [{ role: Role.Admin }] };
     user.name = randomName();
@@ -18,7 +18,7 @@ async function createAdminUser() {
   
     return user;
 }
-  */
+  
 function randomName() {
       return Math.random().toString(36).substring(2, 12);
 }
@@ -29,7 +29,9 @@ beforeAll(async () => {
   //console.log(registerRes)
   userIdNum = registerRes.body.user.id;
   testUserAuthToken = registerRes.body.token;
-
+  const ad = await createAdminUser()
+  adminUser.password = ad.password
+  adminUser.email = ad.email
   //console.log(testUserAuthToken)
 });
 
