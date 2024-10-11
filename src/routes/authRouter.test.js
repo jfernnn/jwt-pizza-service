@@ -32,9 +32,9 @@ beforeAll(async () => {
   const ad = await createAdminUser()
   adminUser.password = ad.password
   adminUser.email = ad.email
-
-  const addItem1 = { title:"Veggie", description: "A garden of delight", image:"pizza1.png", price: 0.0038 }
-  const addItem2 = { title:"Pepperoni", description: "Spicy treat", image:"pizza2.png", price: 0.0042 }
+/*
+  const addItem1 = { id:1, title:"Veggie", description: "A garden of delight", image:"pizza1.png", price: 0.0038 }
+  const addItem2 = { id:2, title:"Pepperoni", description: "Spicy treat", image:"pizza2.png", price: 0.0042 }
   await DB.addMenuItem(addItem1)
   await DB.addMenuItem(addItem2)
 
@@ -48,7 +48,7 @@ beforeAll(async () => {
   await DB.createStore(addStore)
 
 
-
+*/
   //console.log(testUserAuthToken)
 });
 
@@ -115,22 +115,6 @@ test('test add item to menu fail', async () => {
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
 });
 
-test('test place and get order success', async () => {
-   // const loginRes = await request(app).put('/api/auth').send(testUser);
-
-    const orderRequest = {
-        franchiseId: 1,
-        storeId: 1,
-        items: [
-          { menuId: 1, description: 'Veggie', price: 0.05 },
-        ],
-    };
-    const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
-    expect(homePage.status).toBe(200);
-    const getOrders = await request(app).get('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
-    expect(getOrders.status).toBe(200);
-    //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
-});
 
 test('test order pizza w invalid order', async () => {
     // const loginRes = await request(app).put('/api/auth').send(testUser);
@@ -267,8 +251,64 @@ test('test create franchise success', async () => {
     expect(logoutRes.status).toBe(200)
 });
 
-test('test delete franchise fail', async () => {
+test('test create store fail', async () => {
+    const testStore= {franchiseId: 1, name:"SLC"}
+    testStore.name = randomName()
+    const storeRes = await request(app).post(`/api/franchise/1/store`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testStore);
+    expect(storeRes.status).toBe(403)
 
+});
+
+test('test create store success', async () => {
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+
+    const testStore= {franchiseId: 1, name:"SLC"}
+    testStore.name = randomName()
+    const storeRes = await request(app).post(`/api/franchise/${franchiseID}/store`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testStore);
+    expect(storeRes.status).toBe(200)
+    storeID = storeRes.body.id
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+});
+
+test('test place and get order success', async () => {
+    // const loginRes = await request(app).put('/api/auth').send(testUser);
+ 
+     const orderRequest = {
+         franchiseId: franchiseID,
+         storeId: storeID,
+         items: [
+           { menuId: 12, description: 'Josh', price: 0.00014 },
+         ],
+     };
+     const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
+     expect(homePage.status).toBe(200);
+     const getOrders = await request(app).get('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+     expect(getOrders.status).toBe(200);
+     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+ });
+
+ test('test delete store fail', async () => {
+    const storeRes = await request(app).delete(`/api/franchise/999/store/${storeID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
+    expect(storeRes.status).toBe(403)
+
+});
+
+test('test delete store success', async () => {
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+
+    const storeRes = await request(app).delete(`/api/franchise/${franchiseID}/store/${storeID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
+    expect(storeRes.status).toBe(200)
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+});
+
+
+test('test delete franchise fail', async () => {
     const franchiseRes = await request(app).delete(`/api/franchise/${franchiseID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
     expect(franchiseRes.status).toBe(403)
 });
@@ -296,44 +336,6 @@ test('test delete franchise success', async () => {
     expect(logoutRes.status).toBe(200)
 });
 
-test('test create store fail', async () => {
-    const testStore= {franchiseId: 1, name:"SLC"}
-    testStore.name = randomName()
-    const storeRes = await request(app).post(`/api/franchise/1/store`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testStore);
-    expect(storeRes.status).toBe(403)
-
-});
-
-test('test create store success', async () => {
-    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
-    expect(registerResAdmin.status).toBe(200);
-    const testAdminAuthToken = registerResAdmin.body.token;
-
-    const testStore= {franchiseId: 1, name:"SLC"}
-    testStore.name = randomName()
-    const storeRes = await request(app).post(`/api/franchise/1/store`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(testStore);
-    expect(storeRes.status).toBe(200)
-    storeID = storeRes.body.id
-    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
-    expect(logoutRes.status).toBe(200)
-});
-
-test('test delete store fail', async () => {
-    const storeRes = await request(app).delete(`/api/franchise/999/store/${storeID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
-    expect(storeRes.status).toBe(403)
-
-});
-
-test('test delete store success', async () => {
-    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
-    expect(registerResAdmin.status).toBe(200);
-    const testAdminAuthToken = registerResAdmin.body.token;
-
-    const storeRes = await request(app).delete(`/api/franchise/1/store/${storeID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
-    expect(storeRes.status).toBe(200)
-    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
-    expect(logoutRes.status).toBe(200)
-});
 
 test('logout', async () => {
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
