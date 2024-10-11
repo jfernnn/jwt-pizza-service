@@ -291,7 +291,7 @@ test('test place and get order success', async () => {
         "franchiseId": 1000,
         "storeId": 1000,
         "items": [
-           { "menuId": 8, "description": 'Pep', "price": 0.0056 },
+           { "menuId": 8,  "description": 'Pep', "price": 0.0056 },
         ],
     };
     const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testAdminAuthToken}`).send(orderRequest);
