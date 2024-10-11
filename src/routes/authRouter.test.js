@@ -241,7 +241,7 @@ test('test create franchise success', async () => {
     expect(registerResAdmin.status).toBe(200);
     
     const testAdminAuthToken = registerResAdmin.body.token;
-    const testFranchise = { id:3, name: "tester", admins: [{"email": adminUser.email}] }
+    const testFranchise = { id:4, name: "tester", admins: [{"email": adminUser.email}] }
     testFranchise.name = randomName()
     const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testFranchise);
     expect(franchiseRes.status).toBe(200)
@@ -280,7 +280,7 @@ test('test place and get order success', async () => {
          franchiseId: franchiseID,
          storeId: storeID,
          items: [
-           { menuId: 12, description: 'Josh', price: 0.00014 },
+           { menuId: 14, title: 'Josh', description: "Nothing but cheese.. and I mean nothing", price: 0.00014 },
          ],
      };
      const homePage = await request(app).post('/api/order').set("Authorization", `Bearer ${testUserAuthToken}`).send(orderRequest);
