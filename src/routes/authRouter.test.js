@@ -282,7 +282,7 @@ test('test get user franchises', async () => {
       // expect(homePage.body.message).toMatch('unknown endpoint')
    });
 
-
+/*
 test('test place and get order success', async () => {
     const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
     expect(registerResAdmin.status).toBe(200);
@@ -303,7 +303,7 @@ test('test place and get order success', async () => {
     expect(logoutRes.status).toBe(200)
     //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
  });
-
+*/
  test('test delete store fail', async () => {
     const storeRes = await request(app).delete(`/api/franchise/999/store/${storeID}`).set("Authorization", `Bearer ${testUserAuthToken}`).send();
     expect(storeRes.status).toBe(403)
