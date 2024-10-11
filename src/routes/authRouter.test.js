@@ -241,7 +241,7 @@ test('test create franchise success', async () => {
     expect(registerResAdmin.status).toBe(200);
     
     const testAdminAuthToken = registerResAdmin.body.token;
-    const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
+    const testFranchise = { id:3, name: "tester", admins: [{"email": adminUser.email}] }
     testFranchise.name = randomName()
     const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testFranchise);
     expect(franchiseRes.status).toBe(200)
