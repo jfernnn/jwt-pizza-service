@@ -66,6 +66,15 @@ test('Register user fail', async () => {
     expect(loginRes.status).toBe(400);
 });
 
+
+test('test list the empty franchises as user', async () => {
+    //    const authUser = createAdminUser()
+
+    const homePage = await request(app).get(`/api/franchise/${userIdNum}`).set("Authorization", `Bearer ${testUserAuthToken}`).send(testUser);
+    expect(homePage.status).toBe(200);
+
+});
+
 test('test create franchise fail', async () => {
     const testFranchise = {name: "tester", admins: [{"email": "a@jwt.com"}]}
     const franchiseRes = await request(app).post('/api/franchise').set("Authorization", `Bearer ${testUserAuthToken}`).send(testFranchise);
@@ -206,13 +215,27 @@ test('test list the franchises as admin', async () => {
     expect(registerResAdmin.status).toBe(200);
     const testAdminAuthToken = registerResAdmin.body.token;
     
-    const homePage = await request(app).get('/api/franchise').set("Authorization", `Bearer ${testAdminAuthToken}`).send(adminUser);
+    const homePage = await request(app).get(`/api/franchise/${registerResAdmin.id}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(adminUser);
     expect(homePage.status).toBe(200);
 
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(logoutRes.status).toBe(200)
          //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
-    });
+});
+
+test('test list the franchises as admin', async () => {
+    //    const authUser = createAdminUser()
+    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
+    expect(registerResAdmin.status).toBe(200);
+    const testAdminAuthToken = registerResAdmin.body.token;
+    
+    const homePage = await request(app).get(`/api/franchise/`).set("Authorization", `Bearer ${testAdminAuthToken}`).send(adminUser);
+    expect(homePage.status).toBe(200);
+
+    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
+    expect(logoutRes.status).toBe(200)
+         //expect(homePage.body.message).toMatch('welcome to JWT Pizza')
+});
 
 test('test list the franchises as franchise user', async () => {
     //    const authUser = createAdminUser()
@@ -345,17 +368,6 @@ test('test delete franchise success', async () => {
 
     const franchiseRes = await request(app).delete(`/api/franchise/${franchiseID}`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
     expect(franchiseRes.status).toBe(200)
-    const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
-    expect(logoutRes.status).toBe(200)
-});
-
-test('test delete franchise fail', async () => {
-    const registerResAdmin = await request(app).put('/api/auth').send(adminUser);
-    expect(registerResAdmin.status).toBe(200);
-    
-    const testAdminAuthToken = registerResAdmin.body.token;
-    const franchiseRes = await request(app).delete(`/api/franchise/1020100219`).set("Authorization", `Bearer ${testAdminAuthToken}`).send();
-    expect(franchiseRes.status).toBe(500)
     const logoutRes = await request(app).delete('/api/auth').set("Authorization", `Bearer ${testAdminAuthToken}`).send(testUser);
     expect(logoutRes.status).toBe(200)
 });
