@@ -5,7 +5,7 @@ const { Role/*, DB */} = require('../database/database.js');
 const testUser = { name: 'pizza diner', email: 'reg@test.com', password: 'a' };
 let testUserAuthToken;
 let userIdNum;
-let adminUser = { email: 'a@jwt.com', password: 'admin'}
+let adminUser = { name: '常用名字', email: 'a@jwt.com', password: 'admin'}
 let franchiseID;
 let storeID;
 /*
