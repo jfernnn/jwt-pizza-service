@@ -156,4 +156,4 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: jwt-pizza-service
           cluster: jwt-pizza-services
-          wait-for-service-stability: false
+          wait-for-service-stability: false 
