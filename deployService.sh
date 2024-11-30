@@ -12,7 +12,7 @@ if [[ -z "$key" || -z "$hostname" ]]; then
     exit 1
 fi
 service="jwt-pizza-service"
- 
+  
 printf "\n----> Deploying $service to $hostname with $key\n"
 
 # Step 1
