@@ -21,7 +21,7 @@ authRouter.endpoints = [
     example: `curl -X PUT localhost:3000/api/auth -d '{"email":"a@jwt.com", "password":"admin"}' -H 'Content-Type: application/json'`,
     response: { user: { id: 1, name: '常用名字', email: 'a@jwt.com', roles: [{ role: 'admin' }] }, token: 'tttttt' },
   },
-  {
+  { 
     method: 'PUT',
     path: '/api/auth/:userId',
     requiresAuth: true,
