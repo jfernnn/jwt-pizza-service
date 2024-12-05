@@ -1,5 +1,5 @@
 const config = require('./config.js');
-const os = require('os');
+//const os = require('os');
 /*
 function getCpuUsagePercentage() {
   const cpuUsage = os.loadavg()[0] / os.cpus().length;
@@ -144,7 +144,7 @@ class Metrics {
         if (!response.ok) {
           console.error('Failed to push metrics data to Grafana');
         } else {
-          console.log(`Pushed ${metric}`);
+          console.log(`Pushed ${metrics}`);
         }
       })
       .catch((error) => {
