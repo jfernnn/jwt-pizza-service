@@ -8,6 +8,7 @@ const config = require('./config.js');
 const app = express();
 app.use(express.json());
 app.use(setAuthUser);
+const metrics = require('../metrics.js');
 app.use(metrics.requestTracker);
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -22,7 +23,7 @@ app.use('/api', apiRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/order', orderRouter);
 apiRouter.use('/franchise', franchiseRouter);
-const metricss = require('../metrics.js');
+
 apiRouter.use('/docs', (req, res) => {
   res.json({
     version: version.version,
