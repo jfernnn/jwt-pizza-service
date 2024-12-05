@@ -1,4 +1,4 @@
-const config = require('./config.js');
+const config = require('./src/config')
 //const os = require('os');
 /*
 function getCpuUsagePercentage() {
