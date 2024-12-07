@@ -1,6 +1,6 @@
 const config = require('./config')
-//const os = require('os');
-/*
+const os = require('os');
+
 function getCpuUsagePercentage() {
   const cpuUsage = os.loadavg()[0] / os.cpus().length;
   return cpuUsage.toFixed(2) * 100;
@@ -13,7 +13,7 @@ function getMemoryUsagePercentage() {
   const memoryUsage = (usedMemory / totalMemory) * 100;
   return memoryUsage.toFixed(2);
 }
-*/
+
 class MetricBuilder {
   constructor() {
     this.metrics = [];
@@ -27,51 +27,6 @@ class MetricBuilder {
     return this.metrics.join(separator);
   }
 }
-/*
-function httpMetrics(buf) {
-  buf.addMetric('request', 'get', 'totel', );
-  buf.addMetric('http_requests_total', 50, { method: 'POST' });
-  buf.addMetric('http_requests_total', 30, { method: 'DELETE' });
-}
-
-function systemMetrics(buf) {
-  buf.addMetric('cpu', getCpuUsagePercentage(), {})
-  buf.addMetric('memory', getMemoryUsagePercentage(), {})
-}
-
-function userMetrics(buf) {
-
-}
-
-function purchaseMetrics(buf) {
-
-}
-
-function authMetrics(buf) {
-  buf.addMetric('auth_attempts_total', 10, { status: 'success' });
-  buf.addMetric('auth_attempts_total', 5, { status: 'failed' });
-}
-*/
-/*
-function sendMetricsPeriodically(period) {
-    const timer = setInterval(() => {
-      try {
-        const buf = new MetricBuilder();
-        httpMetrics(buf);
-        systemMetrics(buf);
-        userMetrics(buf);
-        purchaseMetrics(buf);
-        authMetrics(buf);
-  
-        const metrics = buf.toString('\n');
-        this.sendMetricToGrafana(metrics);
-      } catch (error) {
-        console.log('Error sending metrics', error);
-      }
-    }, period);
-    timer.unref();
-}
-*/
 
 class Metrics {
   constructor() {
@@ -79,40 +34,73 @@ class Metrics {
     this.getRequests = 0;
     this.postRequests = 0;
     this.putRequests = 0;
-    this.deleteRequests = 0;
+    this.deleteRequests = 0;/*
+    this.activeUsers = 0;
+    this.authSuccess = 0;
+    this.authFailure = 0;
+    this.pizzasSold = 0;
+    this.pizzaCreationFail = 0;
+    this.revenue = 0;*/
 
     this.sendMetricsPeriodically(10000)
   }
 
   httpMetrics(buf) {
-    this.getRequests += 8;
-    this.postRequests += 1;
-    this.putRequests += 5;
-    this.deleteRequests += 3;
-    this.totalRequests += this.deleteRequests+this.postRequests+this.putRequests+this.deleteRequests;
     buf.addMetric('request', 'delete', 'total', this.deleteRequests);
     buf.addMetric('request', 'get', 'total', this.getRequests);
     buf.addMetric('request', 'post', 'total', this.postRequests);
     buf.addMetric('request', 'put', 'total', this.putRequests);
     buf.addMetric('request', 'total', 'total', this.totalRequests);
   }
+  incrementDeleteRequests() {
+    this.totalRequests++;
+    this.deleteRequests++;
+  }
+  incrementGetRequests() {
+    this.totalRequests++;
+    this.getRequests++;
+  }
+  incrementPostRequests() {
+    this.totalRequests++;
+    this.postRequests++;
+  }
+  incrementPutRequests() {
+    this.totalRequests++;
+    this.putRequests++;
+  }
 /*
-  systemMetrics(buf) {
-    buf.addMetric('cpu', getCpuUsagePercentage(), {})
-    buf.addMetric('memory', getMemoryUsagePercentage(), {})
-  }
-  
   userMetrics(buf) {
-  
+    buf.addMetric('', '', '', this.activeUsers)
   }
-  
+  userLogin() {
+    this.activeUsers++;
+  }
+  userLogout() {
+    this.activeUsers--;
+  }
+
+  authMetrics(buf) {
+    buf.addMetric('', '', '', this.authSuccess);
+    buf.addMetric('', '', '', this.authFailure);
+  }
+  successfulAuth() {
+    this.authSuccess++;
+  }
+  failureAuth() {
+    this.authFailure++;
+  }
+
+  systemMetrics(buf) {
+    buf.addMetric('cpu', '', '', getCpuUsagePercentage())
+    buf.addMetric('memory', '', '', getMemoryUsagePercentage())
+  }
+
   purchaseMetrics(buf) {
   
   }
-  
-  authMetrics(buf) {
-    buf.addMetric('auth_attempts_total', 10, { status: 'success' });
-    buf.addMetric('auth_attempts_total', 5, { status: 'failed' });
+
+  latencyMetrics(buf) {
+
   }
 */
   sendMetricsPeriodically(period) {
@@ -120,10 +108,11 @@ class Metrics {
       try {
         const buf = new MetricBuilder();
         this.httpMetrics(buf);
-/*        systemMetrics(buf);
-        userMetrics(buf);
-        purchaseMetrics(buf);
-        authMetrics(buf);*/
+   /*     this.systemMetrics(buf);
+        this.userMetrics(buf);
+        this.purchaseMetrics(buf);
+        this.authMetrics(buf);
+        this.latencyMetrics(buf);*/
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);
