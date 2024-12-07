@@ -8,7 +8,8 @@ const config = require('./config.js');
 const app = express();
 app.use(express.json());
 app.use(setAuthUser);
-//const metrics = require('../metrics.js');
+const metrics = require('../metrics.js');
+metrics.sendMetricsPeriodically(10000)
 //app.use(metrics.requestTracker);
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -34,6 +35,7 @@ apiRouter.use('/docs', (req, res) => {
 
 app.get('/', (req, res) => {
   res.json({
+
     message: 'welcome to JWT Pizza',
     version: version.version,
   });
