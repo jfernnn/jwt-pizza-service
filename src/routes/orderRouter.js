@@ -45,8 +45,8 @@ orderRouter.endpoints = [
 // getMenu
 orderRouter.get(
   '/menu',
-  metrics.incrementGetRequests(),
   asyncHandler(async (req, res) => {
+    metrics.incrementGetRequests();
     res.send(await DB.getMenu());
   })
 );
@@ -54,9 +54,9 @@ orderRouter.get(
 // addMenuItem
 orderRouter.put(
   '/menu',
-  metrics.incrementPutRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementPutRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
     }
@@ -70,9 +70,9 @@ orderRouter.put(
 // getOrders
 orderRouter.get(
   '/',
-  metrics.incrementGetRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementGetRequests();
     res.json(await DB.getOrders(req.user, req.query.page));
   })
 );
@@ -80,9 +80,9 @@ orderRouter.get(
 // createOrder
 orderRouter.post(
   '/',
-  metrics.incrementPostRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementPostRequests();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     const r = await fetch(`${config.factory.url}/api/order`, {

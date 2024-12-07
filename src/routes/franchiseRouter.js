@@ -60,8 +60,8 @@ franchiseRouter.endpoints = [
 // getFranchises
 franchiseRouter.get(
   '/',
-  metrics.incrementGetRequests(),
   asyncHandler(async (req, res) => {
+    metrics.incrementGetRequests();
     res.json(await DB.getFranchises(req.user));
   })
 );
@@ -69,9 +69,9 @@ franchiseRouter.get(
 // getUserFranchises
 franchiseRouter.get(
   '/:userId',
-  metrics.incrementGetRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementGetRequests();
     let result = [];
     const userId = Number(req.params.userId);
     if (req.user.id === userId || req.user.isRole(Role.Admin)) {
@@ -85,9 +85,9 @@ franchiseRouter.get(
 // createFranchise
 franchiseRouter.post(
   '/',
-  metrics.incrementPostRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementPostRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to create a franchise', 403);
     }
@@ -100,8 +100,8 @@ franchiseRouter.post(
 // deleteFranchise
 franchiseRouter.delete(
   '/:franchiseId',
-  metrics.incrementDeleteRequests(),
   asyncHandler(async (req, res) => {
+    metrics.incrementDeleteRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to delete a franchise', 403);
     }
@@ -115,9 +115,9 @@ franchiseRouter.delete(
 // createStore
 franchiseRouter.post(
   '/:franchiseId/store',
-  metrics.incrementPostRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementPostRequests();
     const franchiseId = Number(req.params.franchiseId);
     const franchise = await DB.getFranchise({ id: franchiseId });
     if (!franchise || (!req.user.isRole(Role.Admin) && !franchise.admins.some((admin) => admin.id === req.user.id))) {
@@ -131,9 +131,9 @@ franchiseRouter.post(
 // deleteStore
 franchiseRouter.delete(
   '/:franchiseId/store/:storeId',
-  metrics.incrementDeleteRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    metrics.incrementDeleteRequests();
     const franchiseId = Number(req.params.franchiseId);
     const franchise = await DB.getFranchise({ id: franchiseId });
     if (!franchise || (!req.user.isRole(Role.Admin) && !franchise.admins.some((admin) => admin.id === req.user.id))) {
