@@ -60,6 +60,7 @@ async function setAuthUser(req, res, next) {
 // Authenticate token
 authRouter.authenticateToken = (req, res, next) => {
   if (!req.user) {
+    metrics.failureAuth();
     return res.status(401).send({ message: 'unauthorized' });
   }
   next();
@@ -72,10 +73,12 @@ authRouter.post(
     metrics.incrementPostRequests();
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
+      metrics.failureAuth();
       return res.status(400).json({ message: 'name, email, and password are required' });
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
+    metrics.successfulAuth();
     res.json({ user: user, token: auth });
   })
 );
@@ -88,6 +91,7 @@ authRouter.put(
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
+    metrics.successfulAuth();
     res.json({ user: user, token: auth });
   })
 );
@@ -113,6 +117,7 @@ authRouter.put(
     const userId = Number(req.params.userId);
     const user = req.user;
     if (user.id !== userId && !user.isRole(Role.Admin)) {
+      metrics.failureAuth();
       return res.status(403).json({ message: 'unauthorized' });
     }
 
@@ -122,14 +127,14 @@ authRouter.put(
 );
 
 async function setAuth(user) {
-//  metrics.userLogin();
+  metrics.userLogin();
   const token = jwt.sign(user, config.jwtSecret);
   await DB.loginUser(user.id, token);
   return token;
 }
 
 async function clearAuth(req) {
-//  metrics.userLogout();
+  metrics.userLogout();
   const token = readAuthToken(req);
   if (token) {
     await DB.logoutUser(token);

@@ -1,5 +1,5 @@
 const config = require('./config')
-/*const os = require('os');
+const os = require('os');
 
 function getCpuUsagePercentage() {
   const cpuUsage = os.loadavg()[0] / os.cpus().length;
@@ -13,14 +13,18 @@ function getMemoryUsagePercentage() {
   const memoryUsage = (usedMemory / totalMemory) * 100;
   return memoryUsage.toFixed(2);
 }
-*/
+
 class MetricBuilder {
   constructor() {
     this.metrics = [];
   }
 
-  addMetric(metricPrefix, httpMethod, metricName, metricValue) {
+  addHTTPMetric(metricPrefix, httpMethod, metricName, metricValue) {
     this.metrics.push(`${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`);
+  }
+
+  addMetric(metricPrefix, metricName, metricValue) {
+    this.metrics.push(`${metricPrefix},source=${config.metrics.source} ${metricName}=${metricValue}`);
   }
 
   toString(separator = '\n') {
@@ -34,11 +38,11 @@ class Metrics {
     this.getRequests = 0;
     this.postRequests = 0;
     this.putRequests = 0;
-    this.deleteRequests = 0;/*
+    this.deleteRequests = 0;
     this.activeUsers = 0;
     this.authSuccess = 0;
     this.authFailure = 0;
-    this.pizzasSold = 0;
+/*    this.pizzasSold = 0;
     this.pizzaCreationFail = 0;
     this.revenue = 0;*/
 
@@ -46,11 +50,11 @@ class Metrics {
   }
 
   httpMetrics(buf) {
-    buf.addMetric('request', 'delete', 'total', this.deleteRequests);
-    buf.addMetric('request', 'get', 'total', this.getRequests);
-    buf.addMetric('request', 'post', 'total', this.postRequests);
-    buf.addMetric('request', 'put', 'total', this.putRequests);
-    buf.addMetric('request', 'total', 'total', this.totalRequests);
+    buf.addHTTPMetric('request', 'delete', 'total', this.deleteRequests);
+    buf.addHTTPMetric('request', 'get', 'total', this.getRequests);
+    buf.addHTTPMetric('request', 'post', 'total', this.postRequests);
+    buf.addHTTPMetric('request', 'put', 'total', this.putRequests);
+    buf.addHTTPMetric('request', 'total', 'total', this.totalRequests);
   }
   incrementDeleteRequests() {
     this.totalRequests++;
@@ -68,9 +72,9 @@ class Metrics {
     this.totalRequests++;
     this.putRequests++;
   }
-/*
+
   userMetrics(buf) {
-    buf.addMetric('', '', '', this.activeUsers)
+    buf.addMetric('auth', 'active_users', this.activeUsers)
   }
   userLogin() {
     this.activeUsers++;
@@ -80,8 +84,8 @@ class Metrics {
   }
 
   authMetrics(buf) {
-    buf.addMetric('', '', '', this.authSuccess);
-    buf.addMetric('', '', '', this.authFailure);
+    buf.addMetric('auth', 'success', this.authSuccess);
+    buf.addMetric('auth', 'failure', this.authFailure);
   }
   successfulAuth() {
     this.authSuccess++;
@@ -91,10 +95,10 @@ class Metrics {
   }
 
   systemMetrics(buf) {
-    buf.addMetric('cpu', '', '', getCpuUsagePercentage())
-    buf.addMetric('memory', '', '', getMemoryUsagePercentage())
+    buf.addMetric('system', 'cpu', getCpuUsagePercentage())
+    buf.addMetric('system', 'memory', getMemoryUsagePercentage())
   }
-
+/*
   purchaseMetrics(buf) {
   
   }
@@ -108,10 +112,10 @@ class Metrics {
       try {
         const buf = new MetricBuilder();
         this.httpMetrics(buf);
-   /*     this.systemMetrics(buf);
         this.userMetrics(buf);
-        this.purchaseMetrics(buf);
         this.authMetrics(buf);
+        this.systemMetrics(buf);
+   /*     this.purchaseMetrics(buf);
         this.latencyMetrics(buf);*/
   
         const metrics = buf.toString('\n');
