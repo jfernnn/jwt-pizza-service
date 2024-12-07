@@ -60,6 +60,7 @@ franchiseRouter.endpoints = [
 // getFranchises
 franchiseRouter.get(
   '/',
+  metrics.incrementGetRequests(),
   asyncHandler(async (req, res) => {
     res.json(await DB.getFranchises(req.user));
   })
@@ -129,8 +130,8 @@ franchiseRouter.post(
 
 // deleteStore
 franchiseRouter.delete(
-  metrics.incrementDeleteRequests(),
   '/:franchiseId/store/:storeId',
+  metrics.incrementDeleteRequests(),
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
     const franchiseId = Number(req.params.franchiseId);

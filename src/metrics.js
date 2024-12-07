@@ -1,5 +1,5 @@
 const config = require('./config')
-const os = require('os');
+/*const os = require('os');
 
 function getCpuUsagePercentage() {
   const cpuUsage = os.loadavg()[0] / os.cpus().length;
@@ -13,7 +13,7 @@ function getMemoryUsagePercentage() {
   const memoryUsage = (usedMemory / totalMemory) * 100;
   return memoryUsage.toFixed(2);
 }
-
+*/
 class MetricBuilder {
   constructor() {
     this.metrics = [];
