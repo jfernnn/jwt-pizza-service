@@ -20,7 +20,7 @@ class MetricBuilder {
   }
 
   addMetric(metricPrefix, httpMethod, metricName, metricValue) {
-    this.metrics.push(`${metricPrefix},source=${config.source},method=${httpMethod} ${metricName}=${metricValue}`);
+    this.metrics.push(`${metricPrefix},source=${config.metrics.source},method=${httpMethod} ${metricName}=${metricValue}`);
   }
 
   toString(separator = '\n') {
@@ -135,10 +135,10 @@ class Metrics {
   }
 
   sendMetricToGrafana(metrics) {
-    fetch(`${config.url}`, {
+    fetch(`${config.metrics.url}`, {
       method: 'post',
       body: metrics,
-      headers: { Authorization: `Bearer ${config.userId}:${config.apiKey}` },
+      headers: { Authorization: `Bearer ${config.metrics.userId}:${config.metrics.apiKey}` },
     })
       .then((response) => {
         if (!response.ok) {
