@@ -90,11 +90,11 @@ class Metrics {
     this.putRequests += 5;
     this.deleteRequests += 3;
     this.totalRequests += this.deleteRequests+this.postRequests+this.putRequests+this.deleteRequests;
-    buf.addMetric('request', 'delete', 'totel', this.deleteRequests);
-    buf.addMetric('request', 'get', 'totel', this.getRequests);
-    buf.addMetric('request', 'post', 'totel', this.postRequests);
-    buf.addMetric('request', 'put', 'totel', this.putRequests);
-    buf.addMetric('request', 'total', 'totel', this.totalRequests);
+    buf.addMetric('request', 'delete', 'total', this.deleteRequests);
+    buf.addMetric('request', 'get', 'total', this.getRequests);
+    buf.addMetric('request', 'post', 'total', this.postRequests);
+    buf.addMetric('request', 'put', 'total', this.putRequests);
+    buf.addMetric('request', 'total', 'total', this.totalRequests);
   }
 /*
   systemMetrics(buf) {
