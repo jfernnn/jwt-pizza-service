@@ -45,7 +45,7 @@ class Metrics {
     this.pizzasSold = 0;
     this.pizzaCreationFail = 0;
     this.revenue = 0;
-  //  this.pizzaCreationLatency = 0;
+    this.pizzaCreationLatency = 0;
     this.serviceEndpointLatency = 0;
     //this.pizzaCreationLatency = [];
     //this.serviceLatency = [];
