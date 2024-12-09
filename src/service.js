@@ -5,13 +5,11 @@ const franchiseRouter = require('./routes/franchiseRouter.js');
 const version = require('./version.json');
 const config = require('./config.js');
 
-const logger = require('./logger.js');
 
 const app = express();
 app.use(express.json());
 app.use(setAuthUser);
 
-app.use(logger.httpLogger);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
