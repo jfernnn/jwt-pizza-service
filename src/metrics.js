@@ -117,17 +117,17 @@ class Metrics {
   determineRevenue(order_price) {
     this.revenue += order_price;
   }
-/*
+
   latencyMetrics(buf) {
     //const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
    // const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
     buf.addMetric('lat', 'pizza_creation', this.pizzaCreationLatency)// pizzaLatencyAvg);
-    buf.addMetric('lat', 'service_time', this.serviceLatency)// serviceLatencyAvg);
+    buf.addMetric('lat', 'service_time', this.serviceEndpointLatency)// serviceLatencyAvg);
   }
   pizzaLatency(latency) {
     this.pizzaCreationLatency += latency;
    // this.pizzaCreationLatency.push(latency);
-  }*/
+  }
   serviceLatency(latency) {
     this.serviceEndpointLatency += latency; //.push(latency);
   }
@@ -141,7 +141,7 @@ class Metrics {
         this.authMetrics(buf);
         this.systemMetrics(buf);
         this.purchaseMetrics(buf);
-  //      this.latencyMetrics(buf);
+        this.latencyMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);

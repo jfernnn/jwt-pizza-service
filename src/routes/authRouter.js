@@ -92,15 +92,15 @@ authRouter.post(
 authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
- //   const startTime = performance.now();
+    const startTime = Date.now();
     metrics.incrementPutRequests();
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
 
     metrics.successfulAuth();
-//    const endTime = performance.now();
- //   metrics.serviceLatency(endTime - startTime)
+    const endTime = Date.now();
+    metrics.serviceLatency(endTime - startTime)
 
     res.json({ user: user, token: auth });
   })
