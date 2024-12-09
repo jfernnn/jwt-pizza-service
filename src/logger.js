@@ -4,7 +4,7 @@ class Logger {
   httpLogger = (req, res, next) => {
     let send = res.send;
     res.send = (resBody) => {
-      const logData = {
+      const logData = { 
         authorized: !!req.headers.authorization,
         path: req.originalUrl,
         method: req.method,
