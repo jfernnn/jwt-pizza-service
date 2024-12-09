@@ -93,10 +93,13 @@ orderRouter.post(
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
     let metrics_order_price = 0;
-    for (const item of order.items) {
+    
+    for (const item of orderReq.items) {
       metrics_order_price += item.price
     }
     metrics.determineRevenue(metrics_order_price)
+    metrics.purchaseSuccess(orderReq.items.length)
+
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', authorization: `Bearer ${config.factory.apiKey}` },

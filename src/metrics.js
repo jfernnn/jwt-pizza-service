@@ -106,8 +106,8 @@ class Metrics {
     buf.addMetric('pizza', 'purchase_failure', this.pizzaCreationFail);
     buf.addMetric('revenue', 'total', this.revenue);
   }
-  purchaseSuccess() {
-    this.pizzasSold++;
+  purchaseSuccess(pizzas) {
+    this.pizzasSold += pizzas;
   }
   purchaseFailure() {
     this.pizzaCreationFail++; 
@@ -138,7 +138,7 @@ class Metrics {
         this.authMetrics(buf);
         this.systemMetrics(buf);
         this.purchaseMetrics(buf);
-   //     this.latencyMetrics(buf);
+        this.latencyMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);
