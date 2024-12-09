@@ -64,7 +64,7 @@ class Metrics {
   }
   incrementGetRequests() {
     this.totalRequests++;
-    this.getRequests++;
+    this.getRequests++; 
   }
   incrementPostRequests() {
     this.totalRequests++;
