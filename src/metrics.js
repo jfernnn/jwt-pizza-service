@@ -16,7 +16,7 @@ function getMemoryUsagePercentage() {
 
 class MetricBuilder {
   constructor() {
-    this.metrics = [];
+    this.metrics = []; 
   }
 
   addHTTPMetric(metricPrefix, httpMethod, metricName, metricValue) {
@@ -42,11 +42,13 @@ class Metrics {
     this.activeUsers = 0;
     this.authSuccess = 0;
     this.authFailure = 0;
-/*    this.pizzasSold = 0;
+    this.pizzasSold = 0;
     this.pizzaCreationFail = 0;
-    this.revenue = 0;*/
+    this.revenue = 0;
+    this.pizzaCreationLatency = [];
+    this.serviceLatency = [];
 
-    this.sendMetricsPeriodically(10000)
+    this.sendMetricsPeriodically(10000);
   }
 
   httpMetrics(buf) {
@@ -74,7 +76,7 @@ class Metrics {
   }
 
   userMetrics(buf) {
-    buf.addMetric('auth', 'active_users', this.activeUsers)
+    buf.addMetric('auth', 'active_users', this.activeUsers);
   }
   userLogin() {
     this.activeUsers++;
@@ -95,18 +97,38 @@ class Metrics {
   }
 
   systemMetrics(buf) {
-    buf.addMetric('system', 'cpu', getCpuUsagePercentage())
-    buf.addMetric('system', 'memory', getMemoryUsagePercentage())
+    buf.addMetric('system', 'cpu', getCpuUsagePercentage());
+    buf.addMetric('system', 'memory', getMemoryUsagePercentage());
   }
-/*
+
   purchaseMetrics(buf) {
-  
+    buf.addMetric('pizza', 'pizza_purchases', this.pizzasSold);
+    buf.addMetric('pizza', 'purchase_failure', this.pizzaCreationFail);
+    buf.addMetric('revenue', 'total', this.revenue);
+  }
+  purchaseSuccess() {
+    this.pizzasSold++;
+  }
+  purchaseFailure() {
+    this.pizzaCreationFail++;
+  }
+  determineRevenue(order_price) {
+    this.revenue += order_price;
   }
 
   latencyMetrics(buf) {
-
+    const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
+    const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
+    buf.addMetric('latency', 'pizza', pizzaLatencyAvg);
+    buf.addMetric('latency', 'service', serviceLatencyAvg);
   }
-*/
+  pizzaLatency(latency) {
+    this.pizzaCreationLatency.push(latency);
+  }
+  serviceEndpointLatency(latency) {
+    this.serviceLatency.push(latency);
+  }
+
   sendMetricsPeriodically(period) {
     const timer = setInterval(() => {
       try {
@@ -115,8 +137,8 @@ class Metrics {
         this.userMetrics(buf);
         this.authMetrics(buf);
         this.systemMetrics(buf);
-   /*     this.purchaseMetrics(buf);
-        this.latencyMetrics(buf);*/
+        this.purchaseMetrics(buf);
+   //     this.latencyMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);

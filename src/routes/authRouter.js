@@ -70,6 +70,7 @@ authRouter.authenticateToken = (req, res, next) => {
 authRouter.post(
   '/',
   asyncHandler(async (req, res) => {
+    const startTime = performance.now();
     metrics.incrementPostRequests();
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -78,7 +79,11 @@ authRouter.post(
     }
     const user = await DB.addUser({ name, email, password, roles: [{ role: Role.Diner }] });
     const auth = await setAuth(user);
+
     metrics.successfulAuth();
+    const endTime = performance.now();
+    metrics.serviceLatency(endTime - startTime)
+
     res.json({ user: user, token: auth });
   })
 );
@@ -87,11 +92,16 @@ authRouter.post(
 authRouter.put(
   '/',
   asyncHandler(async (req, res) => {
+    const startTime = performance.now();
     metrics.incrementPutRequests();
     const { email, password } = req.body;
     const user = await DB.getUser(email, password);
     const auth = await setAuth(user);
+
     metrics.successfulAuth();
+    const endTime = performance.now();
+    metrics.serviceLatency(endTime - startTime)
+
     res.json({ user: user, token: auth });
   })
 );
@@ -102,7 +112,10 @@ authRouter.delete(
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
     metrics.incrementDeleteRequests();
+    const startTime = performance.now();
     await clearAuth(req);
+    const endTime = performance.now();
+    metrics.serviceLatency(endTime - startTime)
     res.json({ message: 'logout successful' });
   })
 );
@@ -112,6 +125,7 @@ authRouter.put(
   '/:userId',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
+    const startTime = performance.now();
     metrics.incrementPutRequests();
     const { email, password } = req.body;
     const userId = Number(req.params.userId);
@@ -122,6 +136,10 @@ authRouter.put(
     }
 
     const updatedUser = await DB.updateUser(userId, email, password);
+
+    const endTime = performance.now();
+    metrics.serviceLatency(endTime - startTime)
+    
     res.json(updatedUser);
   })
 );
