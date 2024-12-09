@@ -110,7 +110,7 @@ class Metrics {
     this.pizzasSold++;
   }
   purchaseFailure() {
-    this.pizzaCreationFail++;
+    this.pizzaCreationFail++; 
   }
   determineRevenue(order_price) {
     this.revenue += order_price;
