@@ -145,16 +145,16 @@ authRouter.put(
 );
 
 async function setAuth(user) {
-  metrics.userLogin();
   const token = jwt.sign(user, config.jwtSecret);
   await DB.loginUser(user.id, token);
+  metrics.userLogin();
   return token;
 }
 
 async function clearAuth(req) {
-  metrics.userLogout();
   const token = readAuthToken(req);
   if (token) {
+    metrics.userLogout();
     await DB.logoutUser(token);
   }
 }

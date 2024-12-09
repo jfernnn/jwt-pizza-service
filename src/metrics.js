@@ -121,8 +121,8 @@ class Metrics {
   latencyMetrics(buf) {
     //const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
    // const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
-    buf.addMetric('latency', 'pizza', this.pizzaCreationLatency)// pizzaLatencyAvg);
-    buf.addMetric('latency', 'service', this.serviceLatency)// serviceLatencyAvg);
+    buf.addMetric('latency', 'pizza_creation', this.pizzaCreationLatency)// pizzaLatencyAvg);
+    buf.addMetric('latency', 'service_time', this.serviceLatency)// serviceLatencyAvg);
   }
   pizzaLatency(latency) {
     this.pizzaCreationLatency += latency;
