@@ -46,7 +46,7 @@ class Metrics {
     this.pizzaCreationFail = 0;
     this.revenue = 0;
     this.pizzaCreationLatency = 0;
-    this.serviceLatency = 0;
+    this.serviceEndpointLatency = 0;
     //this.pizzaCreationLatency = [];
     //this.serviceLatency = [];
 
@@ -121,15 +121,15 @@ class Metrics {
   latencyMetrics(buf) {
     //const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
    // const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
-    buf.addMetric('latency', 'pizza_creation', this.pizzaCreationLatency)// pizzaLatencyAvg);
-    buf.addMetric('latency', 'service_time', this.serviceLatency)// serviceLatencyAvg);
+    buf.addMetric('lat', 'pizza_creation', this.pizzaCreationLatency)// pizzaLatencyAvg);
+    buf.addMetric('lat', 'service_time', this.serviceLatency)// serviceLatencyAvg);
   }
   pizzaLatency(latency) {
     this.pizzaCreationLatency += latency;
    // this.pizzaCreationLatency.push(latency);
   }
-  serviceEndpointLatency(latency) {
-    this.serviceLatency += latency; //.push(latency);
+  serviceLatency(latency) {
+    this.serviceEndpointLatency += latency; //.push(latency);
   }
 
   sendMetricsPeriodically(period) {
