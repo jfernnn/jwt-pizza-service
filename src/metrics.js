@@ -138,7 +138,7 @@ class Metrics {
         this.authMetrics(buf);
         this.systemMetrics(buf);
         this.purchaseMetrics(buf);
-        this.latencyMetrics(buf);
+       // this.latencyMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);
