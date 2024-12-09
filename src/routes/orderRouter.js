@@ -92,7 +92,7 @@ orderRouter.post(
     metrics.incrementPostRequests();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
-    metrics_order_price = 0;
+    let metrics_order_price = 0;
     for (const item of order.items) {
       metrics_order_price += item.price
     }
