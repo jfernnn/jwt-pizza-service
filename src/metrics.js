@@ -45,8 +45,10 @@ class Metrics {
     this.pizzasSold = 0;
     this.pizzaCreationFail = 0;
     this.revenue = 0;
-    this.pizzaCreationLatency = [];
-    this.serviceLatency = [];
+    this.pizzaCreationLatency = 0;
+    this.serviceLatency = 0;
+    //this.pizzaCreationLatency = [];
+    //this.serviceLatency = [];
 
     this.sendMetricsPeriodically(10000);
   }
@@ -93,7 +95,7 @@ class Metrics {
     this.authSuccess++;
   }
   failureAuth() {
-    this.authFailure++;
+    this.authFailure--;
   }
 
   systemMetrics(buf) {
@@ -106,8 +108,8 @@ class Metrics {
     buf.addMetric('pizza', 'purchase_failure', this.pizzaCreationFail);
     buf.addMetric('revenue', 'total', this.revenue);
   }
-  purchaseSuccess(pizzas) {
-    this.pizzasSold += pizzas;
+  purchaseSuccess() {
+    this.pizzasSold++;
   }
   purchaseFailure() {
     this.pizzaCreationFail++; 
@@ -117,16 +119,17 @@ class Metrics {
   }
 
   latencyMetrics(buf) {
-    const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
-    const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
-    buf.addMetric('latency', 'pizza', pizzaLatencyAvg);
-    buf.addMetric('latency', 'service', serviceLatencyAvg);
+    //const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
+   // const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
+    buf.addMetric('latency', 'pizza', this.pizzaCreationLatency)// pizzaLatencyAvg);
+    buf.addMetric('latency', 'service', this.serviceLatency)// serviceLatencyAvg);
   }
   pizzaLatency(latency) {
-    this.pizzaCreationLatency.push(latency);
+    this.pizzaCreationLatency += latency;
+   // this.pizzaCreationLatency.push(latency);
   }
   serviceEndpointLatency(latency) {
-    this.serviceLatency.push(latency);
+    this.serviceLatency += latency; //.push(latency);
   }
 
   sendMetricsPeriodically(period) {
@@ -138,7 +141,7 @@ class Metrics {
         this.authMetrics(buf);
         this.systemMetrics(buf);
         this.purchaseMetrics(buf);
-       // this.latencyMetrics(buf);
+        this.latencyMetrics(buf);
   
         const metrics = buf.toString('\n');
         this.sendMetricToGrafana(metrics);

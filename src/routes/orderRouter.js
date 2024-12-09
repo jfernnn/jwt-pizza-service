@@ -4,7 +4,8 @@ const { Role, DB } = require('../database/database.js');
 const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 
-const metrics = require('../metrics.js')
+const metrics = require('../metrics.js');
+const logger = require('../logger.js');
 
 const orderRouter = express.Router();
 
@@ -98,7 +99,6 @@ orderRouter.post(
       metrics_order_price += item.price
     }
     metrics.determineRevenue(metrics_order_price)
-    metrics.purchaseSuccess(orderReq.items.length)
 
     const r = await fetch(`${config.factory.url}/api/order`, {
       method: 'POST',
@@ -106,9 +106,12 @@ orderRouter.post(
       body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
     });
     const j = await r.json();
+    logger.log('info', 'factory', j)
+
     const endTime = performance.now();
     metrics.pizzaLatency(endTime - startTime)
     if (r.ok) {
+      metrics.purchaseSuccess()
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
     } else {
       metrics.purchaseFailure();
