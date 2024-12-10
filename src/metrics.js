@@ -50,7 +50,7 @@ class Metrics {
     this.pizzaCreationLatencyList = [];
     this.serviceEndpointLatencyList = [];
 
-    this.sendMetricsPeriodically(10000);
+    this.sendMetricsPeriodically(2000);
   }
 
   httpMetrics(buf) {
