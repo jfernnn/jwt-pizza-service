@@ -56,7 +56,7 @@ orderRouter.put(
   '/menu',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
- //   const startTime = performance.now();
+    const startTime = Date.now();
     metrics.incrementPutRequests();
     if (!req.user.isRole(Role.Admin)) {
       throw new StatusCodeError('unable to add menu item', 403);
@@ -64,8 +64,8 @@ orderRouter.put(
 
     const addMenuItemReq = req.body;
     await DB.addMenuItem(addMenuItemReq);
- //   const endTime = performance.now();
- //   metrics.serviceLatency(endTime - startTime)
+    const endTime = Date.now();
+    metrics.serviceLatency(endTime - startTime)
     res.send(await DB.getMenu());
   })
 );
@@ -75,10 +75,10 @@ orderRouter.get(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
-//   const startTime = performance.now();
+   const startTime = Date.now();
     metrics.incrementGetRequests();
-//    const endTime = performance.now();
- //   metrics.serviceLatency(endTime - startTime)
+    const endTime = Date.now();
+    metrics.serviceLatency(endTime - startTime)
     res.json(await DB.getOrders(req.user, req.query.page));
   })
 );
@@ -88,7 +88,7 @@ orderRouter.post(
   '/',
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
- //   const startTime = performance.now();
+    const startTime = Date.now();
     metrics.incrementPostRequests();
     const orderReq = req.body;
     const order = await DB.addDinerOrder(req.user, orderReq);
@@ -106,8 +106,8 @@ orderRouter.post(
     });
     const j = await r.json();
 
-  //  const endTime = performance.now();
-  //  metrics.pizzaLatency(endTime - startTime)
+    const endTime = Date.now();
+    metrics.pizzaLatency(endTime - startTime)
     if (r.ok) {
       metrics.purchaseSuccess()
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });

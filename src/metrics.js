@@ -47,8 +47,8 @@ class Metrics {
     this.revenue = 0;
     this.pizzaCreationLatency = 0;
     this.serviceEndpointLatency = 0;
-    //this.pizzaCreationLatency = [];
-    //this.serviceLatency = [];
+    this.pizzaCreationLatencyList = [];
+    this.serviceEndpointLatencyList = [];
 
     this.sendMetricsPeriodically(10000);
   }
@@ -119,17 +119,22 @@ class Metrics {
   }
 
   latencyMetrics(buf) {
-    //const pizzaLatencyAvg = this.pizzaCreationLatency.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
-   // const serviceLatencyAvg = this.serviceLatency.reduce((sum, num) => sum + num, 0) / this.serviceLatency.length;
-    buf.addMetric('lat', 'pizza_creation', this.pizzaCreationLatency)// pizzaLatencyAvg);
-    buf.addMetric('lat', 'service_time', this.serviceEndpointLatency)// serviceLatencyAvg);
+    if (this.pizzaCreationLatencyList.length > 0) {
+      this.pizzaCreationLatency = this.pizzaCreationLatencyList.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
+      buf.addMetric('lat', 'pizza_creation', this.pizzaCreationLatency)
+      this.pizzaCreationLatencyList = []
+    }
+    if (this.serviceEndpointLatencyList.length > 0) {
+      this.serviceEndpointLatency = this.serviceEndpointLatencyList.reduce((sum, num) => sum + num, 0) / this.serviceEndpointLatencyList.length;
+      buf.addMetric('lat', 'service_time', this.serviceEndpointLatency)
+      this.serviceEndpointLatencyList = []
+    }
   }
   pizzaLatency(latency) {
-    this.pizzaCreationLatency += latency;
-   // this.pizzaCreationLatency.push(latency);
+    this.pizzaCreationLatencyList.push(latency);
   }
   serviceLatency(latency) {
-    this.serviceEndpointLatency += latency; //.push(latency);
+    this.serviceEndpointLatencyList.push(latency);
   }
 
   sendMetricsPeriodically(period) {
