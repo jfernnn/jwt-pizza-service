@@ -10,6 +10,8 @@ const app = express();
 app.use(express.json());
 app.use(setAuthUser);
 
+const logger = require('./logger.js')
+app.use(logger.httpLogger);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');

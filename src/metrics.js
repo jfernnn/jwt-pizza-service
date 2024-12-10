@@ -120,7 +120,7 @@ class Metrics {
 
   latencyMetrics(buf) {
     if (this.pizzaCreationLatencyList.length > 0) {
-      this.pizzaCreationLatency = this.pizzaCreationLatencyList.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatency.length;
+      this.pizzaCreationLatency = this.pizzaCreationLatencyList.reduce((sum, num) => sum + num, 0) / this.pizzaCreationLatencyList.length;
       buf.addMetric('lat', 'pizza_creation', this.pizzaCreationLatency)
       this.pizzaCreationLatencyList = []
     }
