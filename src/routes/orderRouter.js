@@ -5,6 +5,7 @@ const { authRouter } = require('./authRouter.js');
 const { asyncHandler, StatusCodeError } = require('../endpointHelper.js');
 
 const metrics = require('../metrics.js');
+const logger = require('../logger.js');
 
 const orderRouter = express.Router();
 
@@ -105,9 +106,11 @@ orderRouter.post(
       body: JSON.stringify({ diner: { id: req.user.id, name: req.user.name, email: req.user.email }, order }),
     });
     const j = await r.json();
+    logger.log('info', 'factory', j);
+
 
     const endTime = Date.now();
-    metrics.pizzaLatency(endTime - startTime)
+    metrics.pizzaLatency(endTime - startTime);
     if (r.ok) {
       metrics.purchaseSuccess()
       res.send({ order, jwt: j.jwt, reportUrl: j.reportUrl });
