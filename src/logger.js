@@ -28,6 +28,14 @@ class Logger {
     this.sendLogToGrafana(logEvent);
   }
 
+  logDBOrFactory(level, type, logData) {
+    const labels = { component: config.logging.source, level: level, type: type };
+    const values = [this.nowString(), this.sanitize(logData)];
+    const logEvent = { streams: [{ stream: labels, values: [values] }] };
+
+    this.sendLogToGrafana(logEvent);
+  }
+
   statusToLogLevel(statusCode) {
     if (statusCode >= 500) return 'error';
     if (statusCode >= 400) return 'warn';
@@ -40,6 +48,8 @@ class Logger {
 
   sanitize(logData) {
     logData = JSON.stringify(logData);
+    logData = logData.replace(/\\"token\\":\s*\\"[^"]*\\"/g, '\\"token\\": \\"*****\\"');
+    logData = logData.replace(/\\"jwt\\":\s*\\"[^"]*\\"/g, '\\"jwt\\": \\"*****\\"');
     return logData.replace(/\\"password\\":\s*\\"[^"]*\\"/g, '\\"password\\": \\"*****\\"');
   }
 
