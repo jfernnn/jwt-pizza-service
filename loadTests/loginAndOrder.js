@@ -13,7 +13,7 @@ export const options = {
       gracefulStop: '30s',
       stages: [
         { target: 5, duration: '30s' },
-        { target: 15, duration: '1m' },
+        { target: 15, duration: '1m' }, 
         { target: 10, duration: '30s' },
         { target: 0, duration: '30s' },
       ],
